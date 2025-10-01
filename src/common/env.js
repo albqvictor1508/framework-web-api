@@ -5,5 +5,7 @@ export const env = e.cleanEnv(process.env, {
   PORT: e.port(),
 
   BUCKET_ACCESS_KEY_ID: e.str(),
-  BUCKET_SECRET_ACCESS_KEY: e.str()
+  BUCKET_SECRET_ACCESS_KEY: e.str(),
+  BUCKET_NAME: e.str(),
+  BUCKET_REGION: e.str(),
 });
