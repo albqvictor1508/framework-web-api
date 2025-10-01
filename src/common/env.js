@@ -8,4 +8,7 @@ export const env = e.cleanEnv(process.env, {
   BUCKET_SECRET_ACCESS_KEY: e.str(),
   BUCKET_NAME: e.str(),
   BUCKET_REGION: e.str(),
+
+  REDIS_PORT: e.port(),
+  REDIS_URL: e.url(),
 });

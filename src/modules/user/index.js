@@ -1,13 +1,14 @@
-import express from "express"
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { eq } from "drizzle-orm";
+import express from "express";
+import multer from "multer";
+import { z } from "zod";
+import { s3cli } from "../../common/bucket.js";
+import { redis } from "../../common/cache.js";
 import { db } from "../../db/client.js";
 import { users } from "../../db/schema/index.js";
-import { eq } from "drizzle-orm";
-import bcrypt from "bcrypt"
-import { z } from "zod"
-import multer from "multer";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import crypto from "crypto";
-import { s3cli } from "../../common/bucket.js";
 
 const router = express.Router();
 
@@ -78,7 +79,12 @@ router.post("/users", m.single("avatar"), async (request, response) => {
 })
 
 router.get("/users", async (request, response) => {
-  return response.status(200).json(await db.select().from(users));
+  if (await redis.exists("users")) return response.status(200).json(JSON.parse(await redis.get("users")))
+
+  const users = await db.select().from(users);
+  redis.setex("users", '120', JSON.stringify(users));
+
+  return response.status(200).json(users);
 })
 
 export const user = router;

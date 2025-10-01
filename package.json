@@ -15,6 +15,7 @@
     "bcrypt": "^6.0.0",
     "drizzle-orm": "^0.44.5",
     "express": "^5.1.0",
+    "ioredis": "^5.8.0",
     "multer": "^2.0.2",
     "s3": "^4.4.0",
     "swagger-ui-express": "^5.0.1",

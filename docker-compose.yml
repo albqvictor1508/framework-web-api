@@ -7,4 +7,15 @@ services:
       - "8191:8191"
     volumes:
       - ./sqlite:/db
-    command: ["tail", "-f", "/dev/null"]  # Keeps the container running
+    command: ["tail", "-f", "/dev/null"]
+
+  dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ports:
+      - "4444:6379"
+    ulimits:
+      memlock: -1
+    volumes:
+      - dragonflydata:/data
+    command: ["--proactor_threads=4","maxmemory=1GB"]
+
