@@ -18,7 +18,9 @@ const bodySchema = z.object({
   name: z.string().min(3).max(70),
   email: z.email(),
   password: z.string().min(6).max(25),
-  phone: z.string()
+  phone: z.string(),
+  firstNote: z.number().max(10).min(0),
+  secondNote: z.number().max(10).min(0)
 });
 
 const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
@@ -31,7 +33,7 @@ router.post("/users", m.single("avatar"), async (request, response) => {
   } catch (err) {
     return response.status(400).json({ error: true, message: "Corpo da requisição inválido." });
   }
-  const { name, email, password, phone } = request.body;
+  const { name, email, password, phone, firstNote, secondNote } = request.body;
 
   const [emailExist] = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
   if (emailExist) return response.status(400).json({ error: true, message: "Email já está em uso." });
@@ -69,6 +71,8 @@ router.post("/users", m.single("avatar"), async (request, response) => {
       password: hashed,
       phone,
       avatar: avatarUrl,
+      firstNote,
+      secondNote
     });
   } catch (dbError) {
     console.error("Erro na inserção no banco de dados:", dbError);

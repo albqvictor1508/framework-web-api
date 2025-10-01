@@ -19,3 +19,5 @@ services:
       - dragonflydata:/data
     command: ["--proactor_threads=4","maxmemory=1GB"]
 
+volumes:
+  dragonflydata:
