@@ -8,7 +8,7 @@ import { z } from "zod";
 import { s3cli } from "../../common/bucket.js";
 import { redis } from "../../common/cache.js";
 import { db } from "../../db/client.js";
-import { users } from "../../db/schema/index.js";
+import { students, students, users } from "../../db/schema/index.js";
 
 const router = express.Router();
 
@@ -65,7 +65,7 @@ router.post("/users", m.single("avatar"), async (request, response) => {
   const hashed = await bcrypt.hash(password, 10);
 
   try {
-    await db.insert(users).values({
+    await db.insert(students).values({
       name,
       email,
       password: hashed,
@@ -83,12 +83,25 @@ router.post("/users", m.single("avatar"), async (request, response) => {
 })
 
 router.get("/users", async (request, response) => {
-  if (await redis.exists("users")) return response.status(200).json(JSON.parse(await redis.get("users")))
+  if (await redis.exists("students")) return response.status(200).json(JSON.parse(await redis.get("users")))
 
-  const users = await db.select().from(users);
-  redis.setex("users", '120', JSON.stringify(users));
+  const students = await db.select({ id: students.id, name: students.name, avatar: students.avatar }).from(students);
+  redis.setex("users", '120', JSON.stringify(students));
 
-  return response.status(200).json(users);
+  return response.status(200).json(students);
+
 })
 
+router.get("/users/:id", async (request, response) => {
+  const { id } = request.params
+  if (await redis.exists(`students:${id}`)) return response.status(200).json(JSON.parse(await redis.get(`students:${id}`)))
+
+  const student = await db.select().from(students).where(eq(students.id, id));
+  if (!student) return response.status(400).json({ error: "Invalid student ID" })
+
+  redis.setex(`students:${id}`, '120', JSON.stringify(student));
+
+  return response.status(200).json(students);
+
+})
 export const user = router;
