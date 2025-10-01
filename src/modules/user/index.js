@@ -4,8 +4,10 @@ import { users } from "../../db/schema/index.js";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt"
 import { z } from "zod"
+import multer from "multer";
 
 const router = express.Router();
+const m = multer()
 
 const bodySchema = z.object({
   name: z.string().min(3).max(70),
@@ -14,8 +16,8 @@ const bodySchema = z.object({
   phone: z.string()
 })
 
-router.post("/users", async (request, response) => {
-  const { name, email, password, phone } = request.body
+router.post("/users", m.single("avatar"), async (request, response) => {
+  const salve = request.file();
 
   try {
     bodySchema.parse(request.body);
